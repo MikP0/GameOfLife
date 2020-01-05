@@ -1,33 +1,21 @@
-use std::fmt;
-
 #[derive(Debug)]
-enum CellState {
+enum Cell {
     Alive,
     Dead,
-}
-
-struct Point {
-    x: u32,
-    y: u32,
-    state: CellState,
 }
 
 struct World {
     width: u32,
     height: u32,
-    terrain: Vec<Point>,
+    terrain: Vec<Cell>,
 }
 
 impl World {
     fn new(width: u32, height: u32) -> Self {
-        let mut terrain: Vec<Point> = Vec::new();
+        let mut terrain: Vec<Cell> = Vec::new();
         for h in 0..height {
             for w in 0..width {
-                terrain.push(Point {
-                    x: h,
-                    y: w,
-                    state: CellState::Dead,
-                })
+                terrain.push(Cell::Dead)
             }
         }
         Self {
@@ -36,20 +24,27 @@ impl World {
             terrain,
         }
     }
+    fn get_index(&self, row: u32, column: u32) -> usize {
+        (row * self.width + column) as usize
+    }
 
     fn show(self) {
-        for cell in self.terrain {
-            match cell.state {
-                CellState::Dead => print!("0"),
-                CellState::Alive => print!("1"),
+        for h in 0..self.height {
+            for w in 0..self.width {
+                match self.terrain.get(self.get_index(h, w)) {
+                    Some(Cell::Dead) => print!("0"),
+                    Some(Cell::Alive) => print!("1"),
+                    None => print!("x"),
+                }
+                //print!(" {:?} ", cell.state)
             }
-            //print!(" {:?} ", cell.state)
+            println!();
         }
     }
 }
 
 fn main() {
-    let world = World::new(32, 32);
+    let world = World::new(64, 32);
     world.show();
-    loop {}
+    //loop {}
 }
