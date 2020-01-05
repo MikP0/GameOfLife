@@ -13,9 +13,9 @@ struct World {
 impl World {
     fn new(width: u32, height: u32) -> Self {
         let mut terrain: Vec<Cell> = Vec::new();
-        for h in 0..height {
-            for w in 0..width {
-                terrain.push(Cell::Dead)
+        for _h in 0..height {
+            for _w in 0..width {
+                terrain.push(Cell::Dead) //TODO: Add more options to world creation
             }
         }
         Self {
@@ -24,6 +24,7 @@ impl World {
             terrain,
         }
     }
+
     fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
     }
