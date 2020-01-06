@@ -1,4 +1,8 @@
+extern crate rand;
+
+use rand::Rng;
 use std::ops::Not;
+use std::{thread, time};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum Cell {
@@ -28,7 +32,14 @@ impl World {
         let mut terrain: Vec<Cell> = Vec::new();
         for _h in 0..height {
             for _w in 0..width {
-                terrain.push(Cell::Alive) //TODO: Add more options to world creation
+                let mut rng = rand::thread_rng();
+                let num = rng.gen_range(0, 2);
+                println!("{}", num);
+                if num == 1 {
+                    terrain.push(Cell::Alive);
+                } else {
+                    terrain.push(Cell::Dead);
+                }
             }
         }
         Self {
@@ -46,8 +57,8 @@ impl World {
         for h in 0..self.height {
             for w in 0..self.width {
                 match self.terrain.get(self.get_index(h, w)) {
-                    Some(Cell::Dead) => print!("0"),
-                    Some(Cell::Alive) => print!("1"),
+                    Some(Cell::Dead) => print!(" "),
+                    Some(Cell::Alive) => print!("x"),
                     None => print!("x"),
                 }
             }
@@ -112,13 +123,16 @@ impl World {
                 if self.terrain[index] == Cell::Alive {
                     if alive_neighbours > 3 {
                         new_terrain.push(!(self.terrain[index]));
-                    }
-                    if alive_neighbours < 2 {
+                    } else if alive_neighbours < 2 {
                         new_terrain.push(!(self.terrain[index]));
+                    } else {
+                        new_terrain.push(self.terrain[index]);
                     }
                 } else {
                     if alive_neighbours == 3 {
                         new_terrain.push(!self.terrain[index]);
+                    } else {
+                        new_terrain.push(self.terrain[index]);
                     }
                 }
             }
@@ -128,10 +142,13 @@ impl World {
 }
 
 fn main() {
-    let mut world = World::new(8, 8);
-    world.show();
-    println!("{}", world.alive_neighbor_count(0, 3));
-    world.iterate();
-    world.show();
-    //loop {}
+    let mut world = World::new(128, 36);
+
+    loop {
+        world.show();
+        thread::sleep(time::Duration::from_millis(100));
+        world.iterate();
+        thread::sleep(time::Duration::from_millis(200));
+        print!("{}[2J", 27 as char);
+    }
 }
