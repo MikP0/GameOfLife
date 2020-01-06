@@ -1,7 +1,20 @@
-#[derive(Debug)]
+use std::ops::Not;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 enum Cell {
-    Alive,
-    Dead,
+    Alive = 1,
+    Dead = 0,
+}
+
+impl Not for Cell {
+    type Output = Cell;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Cell::Alive => Cell::Dead,
+            Cell::Dead => Cell::Alive,
+        }
+    }
 }
 
 struct World {
@@ -15,7 +28,7 @@ impl World {
         let mut terrain: Vec<Cell> = Vec::new();
         for _h in 0..height {
             for _w in 0..width {
-                terrain.push(Cell::Dead) //TODO: Add more options to world creation
+                terrain.push(Cell::Alive) //TODO: Add more options to world creation
             }
         }
         Self {
@@ -29,7 +42,7 @@ impl World {
         (row * self.width + column) as usize
     }
 
-    fn show(self) {
+    fn show(&self) {
         for h in 0..self.height {
             for w in 0..self.width {
                 match self.terrain.get(self.get_index(h, w)) {
@@ -37,15 +50,88 @@ impl World {
                     Some(Cell::Alive) => print!("1"),
                     None => print!("x"),
                 }
-                //print!(" {:?} ", cell.state)
             }
             println!();
         }
     }
+
+    fn alive_neighbor_count(&self, row: u32, column: u32) -> u8 {
+        let mut count = 0;
+
+        let north = if row == 0 { self.height - 1 } else { row - 1 };
+
+        let south = if row == self.height - 1 { 0 } else { row + 1 };
+
+        let west = if column == 0 {
+            self.width - 1
+        } else {
+            column - 1
+        };
+
+        let east = if column == self.width - 1 {
+            0
+        } else {
+            column + 1
+        };
+
+        let nw = self.get_index(north, west);
+        count += self.terrain[nw] as u8;
+
+        let n = self.get_index(north, column);
+        count += self.terrain[n] as u8;
+
+        let ne = self.get_index(north, east);
+        count += self.terrain[ne] as u8;
+
+        let w = self.get_index(row, west);
+        count += self.terrain[w] as u8;
+
+        let e = self.get_index(row, east);
+        count += self.terrain[e] as u8;
+
+        let sw = self.get_index(south, west);
+        count += self.terrain[sw] as u8;
+
+        let s = self.get_index(south, column);
+        count += self.terrain[s] as u8;
+
+        let se = self.get_index(south, east);
+        count += self.terrain[se] as u8;
+
+        count
+    }
+
+    fn iterate(&mut self) {
+        let mut new_terrain: Vec<Cell> = Vec::new();
+
+        for h in 0..self.height {
+            for w in 0..self.width {
+                let alive_neighbours = self.alive_neighbor_count(h, w);
+                let index = self.get_index(h, w);
+
+                if self.terrain[index] == Cell::Alive {
+                    if alive_neighbours > 3 {
+                        new_terrain.push(!(self.terrain[index]));
+                    }
+                    if alive_neighbours < 2 {
+                        new_terrain.push(!(self.terrain[index]));
+                    }
+                } else {
+                    if alive_neighbours == 3 {
+                        new_terrain.push(!self.terrain[index]);
+                    }
+                }
+            }
+        }
+        self.terrain = new_terrain;
+    }
 }
 
 fn main() {
-    let world = World::new(64, 32);
+    let mut world = World::new(8, 8);
+    world.show();
+    println!("{}", world.alive_neighbor_count(0, 3));
+    world.iterate();
     world.show();
     //loop {}
 }
