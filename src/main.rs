@@ -1,4 +1,5 @@
 extern crate rand;
+extern crate termion;
 
 use rand::Rng;
 use std::ops::Not;
@@ -146,9 +147,9 @@ fn main() {
 
     loop {
         world.show();
-        thread::sleep(time::Duration::from_millis(100));
+        thread::sleep(time::Duration::from_millis(200));
         world.iterate();
         thread::sleep(time::Duration::from_millis(200));
-        print!("{}[2J", 27 as char);
+        print!("{}", termion::clear::All);
     }
 }
