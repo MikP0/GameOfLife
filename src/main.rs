@@ -122,9 +122,7 @@ impl World {
                 let index = self.get_index(h, w);
 
                 if self.terrain[index] == Cell::Alive {
-                    if alive_neighbours > 3 {
-                        new_terrain.push(!(self.terrain[index]));
-                    } else if alive_neighbours < 2 {
+                    if alive_neighbours > 3 || alive_neighbours < 2 {
                         new_terrain.push(!(self.terrain[index]));
                     } else {
                         new_terrain.push(self.terrain[index]);
