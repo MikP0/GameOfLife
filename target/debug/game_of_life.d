@@ -1,1 +1,0 @@
-/home/mikp0/dev/minor/game_of_life/target/debug/game_of_life: /home/mikp0/dev/minor/game_of_life/src/main.rs /home/mikp0/dev/minor/game_of_life/src/viewer.rs /home/mikp0/dev/minor/game_of_life/src/world.rs
