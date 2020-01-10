@@ -2,7 +2,7 @@ use rand::Rng;
 use std::ops::Not;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-enum Cell {
+pub enum Cell {
     Alive = 1,
     Dead = 0,
 }
@@ -19,9 +19,9 @@ impl Not for Cell {
 }
 
 pub struct World {
-    width: u32,
-    height: u32,
-    terrain: Vec<Cell>,
+    pub width: u32,
+    pub height: u32,
+    pub terrain: Vec<Cell>,
 }
 
 impl World {

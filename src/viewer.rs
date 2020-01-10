@@ -1,6 +1,9 @@
 extern crate piston_window;
+extern crate termion;
 
+use crate::world::*;
 use piston_window::*;
+use std::{thread, time};
 
 pub struct Viewer {
     window: PistonWindow,
@@ -14,6 +17,7 @@ impl Viewer {
             .exit_on_esc(true)
             .build()
             .unwrap();
+
         Self {
             window,
             width,
@@ -21,20 +25,25 @@ impl Viewer {
         }
     }
 
-    pub fn draw(&mut self) {
+    pub fn draw(&mut self, mut world: World) {
         while let Some(event) = self.window.next() {
             self.window.draw_2d(&event, |context, graphics, _device| {
-                clear([1.0; 4], graphics);
-
-                for x in 1..4 {
-                    Rectangle::new([1.0, 0.0, 0.0, 1.0]).draw(
-                        [100.0 * x as f64, 0.0, 50.0, 50.0],
-                        &context.draw_state,
-                        context.transform,
-                        graphics,
-                    );
+                clear([0.0; 4], graphics);
+                for h in 0..world.height {
+                    for w in 0..world.width {
+                        if world.terrain[world.get_index(h, w)] == Cell::Alive {
+                            Rectangle::new([1.0, 0.0, 0.0, 1.0]).draw(
+                                [10.0 * w as f64, 10.0 * h as f64, 5.0, 5.0],
+                                &context.draw_state,
+                                context.transform,
+                                graphics,
+                            );
+                        }
+                    }
                 }
             });
+            thread::sleep(time::Duration::from_millis(40));
+            world.iterate();
         }
     }
 }
